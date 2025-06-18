@@ -44,9 +44,9 @@ class BannerController extends Controller
 
     public function store(Request $request){
         $validator=Validator::make($request->all(),[
-         'duongDan'=>'required|string',
-         'hinhAnh'=>'required|string',
-         'fileName'=>'required|string'
+         'duongDan'=>'nullable|string',
+         'hinhAnh'=>'nullable|file|mimes:jpg,jpeg,png|max:2048',
+         'fileName'=>'nullable|string'
         ]);
         if($validator->fails()){
             return response()->json([
@@ -88,7 +88,8 @@ class BannerController extends Controller
 
     $validator = Validator::make($request->all(), [
         'duongDan' => 'nullable|string|max:255',
-        'fileName' => 'required|string',
+        'hinhAnh'=>'nullable|file|mimes:jpg,jpeg,png|max:2048',
+        'fileName' => 'nullable|string',
     ]);
 
     if ($validator->fails()) {

@@ -64,3 +64,7 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+redis-server.exe --port 1000 //khởi động cổng redis1000
+ redis-cli.exe -p 1000 //chạy cổng 1000 ở tab mới
+ KEYS laravel_database_blacklist:token:*
+

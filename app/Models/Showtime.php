@@ -19,10 +19,7 @@ class Showtime extends Model
         'ngayChieu',
         'gioChieu',
         'giaVeThuong',
-        'giaVeVip',
-        'rapChieu',
-        'phim',
-        'danhSachGhe'
+        'giaVeVip'
     ];
     public function rapChieu()
     {

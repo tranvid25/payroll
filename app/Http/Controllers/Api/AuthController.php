@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendNewPassword;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -85,9 +87,18 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
+        $accesstoken=$request->user()->token();
+        $tokenId=$accesstoken->id;
+        //tính ttl còn lại của token
+        $expiresAt=$accesstoken->expires_at;
+        $ttl=Carbon::parse($expiresAt)->diffInSeconds(now());
+        //đưa token vào Redis blackList
+        Redis::setex("blacklist:token:$tokenId",$ttl,true);
+        //thu hồi token
+        $accesstoken->revoke();
         return response()->json([
-            'status' => 'success'
+            'status' => 200,
+            'message'=>'Logged'
         ]);
     }
     public function user(Request $request)
@@ -95,36 +106,40 @@ class AuthController extends Controller
         return response()->json($request->user());
     }
     public function passwordRetrieval(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|exists:users,email',
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email|exists:users,email',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 422,
+            'message' => $validator->errors()->first(),
+            'errors' => $validator->errors()->toArray(),
         ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 422,
-                'message' => $validator->errors()->first(),
-                'errors' => $validator->errors()->toArray(),
-            ]);
-        }
-        $tkEmail = $request->email;
-        $newPwd = Str::random(6);
-        $user = User::where('email', $tkEmail)->first();
-        if ($user) {
-            $user->password = bcrypt($newPwd);
-            $user->save();
-            Mail::send('mail.sendPassword', ['pass' => $newPwd], function ($message) use ($tkEmail) {
-                $message->to($tkEmail)->subject('TVHG-Mật khẩu mới');
-            });
-            return response()->json([
-                'status' => 200,
-                'message' => 'Mật khẩu mới dcd gửi đến email của bạn',
-                'email' => $tkEmail
-            ]);
-        } else {
-            return response()->json([
-                'status' => 404,
-                'message' => 'Email này chưa đăng ký'
-            ]);
-        }
     }
+
+    $tkEmail = $request->email;
+    $newPwd = Str::random(6);
+    $user = User::where('email', $tkEmail)->first();
+
+    if ($user) {
+        $user->password = bcrypt($newPwd);
+        $user->save();
+
+        // Gửi email bằng queue
+        Mail::to($tkEmail)->queue(new SendNewPassword($newPwd));
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Mật khẩu mới đã được gửi đến email của bạn',
+            'email' => $tkEmail
+        ]);
+    }
+
+    return response()->json([
+        'status' => 404,
+        'message' => 'Email này chưa đăng ký'
+    ]);
+}
 }
