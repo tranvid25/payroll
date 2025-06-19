@@ -31,6 +31,7 @@ class Showtime extends Model
     }
     public function danhSachGhe()
     {
-        return $this->hasMany(Movie::class, 'maLichChieu', 'maLichChieu');
+        return $this->hasMany(Seat::class, 'maLichChieu', 'maLichChieu');
     }
+
 }

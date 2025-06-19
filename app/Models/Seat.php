@@ -16,8 +16,11 @@ class Seat extends Model
         'maGhe',
         'tenGhe',
         'loaiGhe',
+        'daDat',
         'nguoiDat',
-        'nguoiChon',
         'maLichChieu',
     ];
+    public function lichchieu(){
+        return $this->belongsTo(Showtime::class,'maLichChieu','maLichChieu');
+    }
 }

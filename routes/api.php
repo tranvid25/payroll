@@ -7,6 +7,11 @@ use App\Http\Controllers\Api\CommentNewsController;
 use App\Http\Controllers\Api\FeedBackController;
 use App\Http\Controllers\Api\MovieController;
 use App\Http\Controllers\Api\newsController;
+use App\Http\Controllers\Api\OrderDetailController;
+use App\Http\Controllers\Api\ProvinceController;
+use App\Http\Controllers\Api\RapChieuController;
+use App\Http\Controllers\Api\SeatController;
+use App\Http\Controllers\Api\ShowtimeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\EmployeeController;
 use App\Models\Employee;
@@ -83,5 +88,30 @@ Route::group([
         Route::post('LayDanhSachPhim/{id}/update', [MovieController::class, 'update']);
         Route::delete('LayDanhSachPhim/{id}/delete', [MovieController::class, 'destroy']);
 
+        //Order
+        Route::get('laydanhsachdonhang', [OrderDetailController::class, 'index']);
+        Route::post('laydanhsachdonhang', [OrderDetailController::class, 'store']);
+        Route::get('laychitietdonhang/{id}', [OrderDetailController::class, 'show']);
+        Route::get('laydanhsachdonhang/{id}', [OrderDetailController::class, 'showByUser']);
+        Route::get('doanhthu/{year}', [OrderDetailController::class, 'doanhthu']);
+        //SEAT
+        Route::get('laydanhsachghe', [SeatController::class, 'index']);
+        Route::post('laydanhsachghe', [SeatController::class, 'store']);
+        Route::get('laydanhsachghe/{id}', [SeatController::class, 'show']);
+        Route::delete('laydanhsachghe/{id}/delete', [SeatController::class, 'destroy']);
+        //Lịch Chiếu
+        Route::get('laydanhsachlichchieu', [ShowtimeController::class, 'index']);
+        Route::get('laydanhsachlichchieu/{id}', [ShowtimeController::class, 'show']);
+        Route::get('laylichchieutheophim/{id}', [ShowtimeController::class, 'showbyMovie']);
+        Route::post('laydanhsachlichchieu/{id}/update', [ShowtimeController::class, 'update']);
+        Route::delete('laydanhsachlichchieu/{id}/delete', [ShowtimeController::class, 'destroy']);
+        //rapchieu
+        Route::get('laydanhsachrap', [RapChieuController::class, 'index']);
+        Route::post('laydanhsachrap', [RapChieuController::class, 'store']);
+        Route::get('laydanhsachrap/{id}', [RapChieuController::class, 'show']);
+        Route::post('laydanhsachrap/{id}/update', [RapChieuController::class, 'update']);
+        Route::delete('laydanhsachrap/{id}/delete', [RapChieuController::class, 'destroy']);
+        //Tỉnh
+        Route::get('laydanhsachtinh', [ProvinceController::class, 'index']);
     });
 });
