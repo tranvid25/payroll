@@ -17,9 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return 'Laravel Docker OK ✅';
 });
-Route::get('getdataEmployees',[EmployeeController::class,'index']);
-Route::get('/combine', [ApiController::class, 'getCombinedData']);
 
 
