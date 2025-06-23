@@ -29,25 +29,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-Route::group([
-    'prefix' => 'auth'
-], function () {
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('signup', [AuthController::class, 'signup']);
-    Route::post('passwordRetrieval', [AuthController::class, 'passwordRetrieval']);
-
-    Route::group([
-        'middleware' => 'auth:api','check.revoked.token'
-    ], function () {
+        //user
         Route::get('laydanhsachuser', [UserController::class, 'index']);
         Route::get('laydanhsachuser/{id}', [UserController::class, 'show']);
         Route::post('laydanhsachuser', [UserController::class, 'store']);
         Route::post('laydanhsachuser/{id}', [UserController::class, 'update']);
-        Route::delete('logout', [AuthController::class, 'logout']);
-        Route::get('me', [AuthController::class, 'user']);
-
-
         //Banner
         Route::get('laydanhsachbanner', [BannerController::class, 'index']);
         Route::post('laydanhsachbanner', [BannerController::class, 'store']);
@@ -113,5 +99,18 @@ Route::group([
         Route::delete('laydanhsachrap/{id}/delete', [RapChieuController::class, 'destroy']);
         //Tỉnh
         Route::get('laydanhsachtinh', [ProvinceController::class, 'index']);
+        Route::post('laydanhsachtinh', [ProvinceController::class, 'store']);
+        Route::group([
+    'prefix' => 'auth'
+], function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('signup', [AuthController::class, 'signup']);
+    Route::post('passwordRetrieval', [AuthController::class, 'passwordRetrieval']);
+
+    Route::group([
+        'middleware' => 'auth:api','check.revoked.token'
+    ], function () {
+        Route::delete('logout', [AuthController::class, 'logout']);
+        Route::get('me', [AuthController::class, 'user']);
     });
 });

@@ -26,39 +26,23 @@ class MovieController extends Controller
             ]);
         }
     }
-    // lấy chi tiết phim kèm với lịch của nó ở các rạp 
+    // lấy chi tiết phim kèm với lịch của nó ở các rạp
     public function show($maPhim)
-{
-    $movie = Movie::with(['lichchieu.rapChieu'])->where('maPhim', $maPhim)->first();
+    {
+        $movie = Movie::with(['lichchieu.rapChieu'])->where('maPhim', $maPhim)->first();
 
-    if (!$movie) {
+        if (!$movie) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Không tìm thấy phim'
+            ]);
+        }
+
         return response()->json([
-            'status' => 404,
-            'message' => 'Không tìm thấy phim'
+            'status' => 200,
+            'content' => $movie
         ]);
     }
-
-    // Gom nhóm các rạp lại
-    $raps = [];
-
-    foreach ($movie->lichchieu as $showtime) {
-        $rapId = $showtime->rapChieu->maRap;
-        $raps[$rapId]['tenRap'] = $showtime->rapChieu->tenRap;
-        $raps[$rapId]['tinhThanh'] = $showtime->rapChieu->tinhThanh;
-        $raps[$rapId]['lichChieu'][] = [
-            'ngay' => $showtime->ngayChieu,
-            'gio' => $showtime->gioChieu,
-            'maLichChieu' => $showtime->id
-        ];
-    }
-
-    return response()->json([
-        'status' => 200,
-        'phim' => $movie->tenPhim,
-        'moTa' => $movie->moTa ?? '',
-        'raps' => array_values($raps)
-    ]);
-}
 
     public function store(Request $request)
 {

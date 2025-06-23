@@ -23,4 +23,20 @@ class ProvinceController extends Controller
             ]);
         }
     }
+    public function store(Request $request){
+        $data=$request->all();
+        $province=Province::create($data);
+        if($province){
+            return response()->json([
+                'status'=>200,
+                'message'=>'Created Province Successfully!'
+            ],200);
+        }
+        else{
+            return response()->json([
+                'status'=>404,
+                'message'=>'Created Province fail'
+            ],404);
+        }
+    }
 }
