@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Route;
         Route::get('laydanhsachuser', [UserController::class, 'index']);
         Route::get('laydanhsachuser/{id}', [UserController::class, 'show']);
         Route::post('laydanhsachuser', [UserController::class, 'store']);
-        Route::post('laydanhsachuser/{id}', [UserController::class, 'update']);
+        Route::post('laydanhsachuser/{id}/update', [UserController::class, 'update']);
         //Banner
         Route::get('laydanhsachbanner', [BannerController::class, 'index']);
         Route::post('laydanhsachbanner', [BannerController::class, 'store']);
@@ -70,6 +70,7 @@ use Illuminate\Support\Facades\Route;
         Route::get('LayDanhSachPhim', [MovieController::class, 'index']);
         Route::post('LayDanhSachPhim', [MovieController::class, 'store']);
         Route::get('LayDanhSachPhim/{id}', [MovieController::class, 'show']);
+        Route::get('LayDanhSachPhim/{id}/City', [MovieController::class, 'showCity']);
         Route::get('LayDanhSachPhim/rap/{id}', [MovieController::class, 'showrap']);
         Route::post('LayDanhSachPhim/{id}/update', [MovieController::class, 'update']);
         Route::delete('LayDanhSachPhim/{id}/delete', [MovieController::class, 'destroy']);
@@ -87,6 +88,7 @@ use Illuminate\Support\Facades\Route;
         Route::delete('laydanhsachghe/{id}/delete', [SeatController::class, 'destroy']);
         //Lịch Chiếu
         Route::get('laydanhsachlichchieu', [ShowtimeController::class, 'index']);
+        Route::post('laydanhsachlichchieu', [ShowtimeController::class, 'store']);
         Route::get('laydanhsachlichchieu/{id}', [ShowtimeController::class, 'show']);
         Route::get('laylichchieutheophim/{id}', [ShowtimeController::class, 'showbyMovie']);
         Route::post('laydanhsachlichchieu/{id}/update', [ShowtimeController::class, 'update']);
@@ -112,5 +114,11 @@ use Illuminate\Support\Facades\Route;
     ], function () {
         Route::delete('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'user']);
+        Route::get('laydanhsachbinhluanphim', [CommentMovieController::class, 'index']);
+        Route::post('laydanhsachbinhluanphim', [CommentMovieController::class, 'store']);
+        Route::get('laydanhsachbinhluanphim/{id}', [CommentMovieController::class, 'show']);
+        Route::get('laydanhsachbinhluanphim/{id}/edit', [CommentMovieController::class, 'edit']);
+        Route::post('laydanhsachbinhluanphim/{id}/update', [CommentMovieController::class, 'update']);
+        Route::delete('laydanhsachbinhluanphim/{id}/delete', [CommentMovieController::class, 'destroy']);
     });
 });

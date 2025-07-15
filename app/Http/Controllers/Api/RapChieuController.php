@@ -26,7 +26,7 @@ class RapChieuController extends Controller
     }
     public function store(Request $request){
         $data=$request->all();
-        $rapchieu=RapChieu::create([$data]);
+        $rapchieu=RapChieu::create($data);
         if($rapchieu){
             return response()->json([
                 'status'=>200,

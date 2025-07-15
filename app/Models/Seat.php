@@ -17,7 +17,7 @@ class Seat extends Model
         'tenGhe',
         'loaiGhe',
         'daDat',
-        'nguoiDat',
+        'giaVe',
         'maLichChieu',
     ];
     public function lichchieu(){

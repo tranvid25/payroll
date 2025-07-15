@@ -87,20 +87,6 @@ class CommentNewsController extends Controller
             ]);
         }
     }
-    public function edit($id){
-        $comment=Comment::findOrFail($id);
-        if($comment){
-            return response()->json([
-                'status'=>200,
-                'content'=>$comment
-            ]);
-        }
-        else{
-            return response()->json([
-                'status'=>404,
-                'message'=>'not found comment'
-            ]);
-        }
-    }
+    
 }
 

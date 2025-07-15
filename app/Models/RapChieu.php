@@ -17,7 +17,6 @@ class RapChieu extends Model
         'tenRap',
         'diaChi',
         'maTinh_id',
-        
     ];
     public function tinhThanh()
     {

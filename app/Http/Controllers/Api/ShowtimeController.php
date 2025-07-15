@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 class ShowtimeController extends Controller
 {
     public function index(){
-        $showtime=Showtime::with(['rapchieu','phim'])->get();
+        $showtime=Showtime::with(['rapchieu.tinhthanh','phim'])->get();
         if($showtime){
             return response()->json([
                 'status'=>200,
@@ -74,7 +74,6 @@ class ShowtimeController extends Controller
         'giaVeThuong' => 'required|numeric|min:0',
         'giaVeVip' => 'required|numeric|min:0',
         'maPhim' => 'required|exists:movies,maPhim',
-        'maRap' => 'required|exists:raps,maRap',
     ]);
 
     if ($validator->fails()) {
@@ -97,30 +96,37 @@ class ShowtimeController extends Controller
 
     // 3. Sinh ghế nếu tạo thành công
     if ($showtime) {
-        $hangs = ['A','B','C','D','E','F','G','H','I','K']; // 10 hàng
-        foreach ($hangs as $hang) {
-            for ($so = 1; $so <= 16; $so++) {
-                $tenGhe = $hang . $so;
+    $seats = [];
+    $hangs = ['A','B','C','D','E','F','G','H','I','K']; // 10 hàng
 
-                if (in_array($hang, ['I', 'K'])) {
-                    $loaiGhe = 'vip';
-                    $giaVe = $request->giaVeVip;
-                } else {
-                    $loaiGhe = 'thuong';
-                    $giaVe = $request->giaVeThuong;
-                }
+    foreach ($hangs as $hang) {
+        for ($so = 1; $so <= 16; $so++) {
+            $tenGhe = $hang . $so;
 
-                Seat::create([
-                    'tenGhe' => $tenGhe,
-                    'loaiGhe' => $loaiGhe,
-                    'giaVe' => $giaVe,
-                    'daDat' => false,
-                    'nguoiDat' => Auth::check() ? Auth::user()->name : null,
-                    'maLichChieu' => $showtime->maLichChieu
-                ]);
+            if (in_array($hang, ['I', 'K'])) {
+                $loaiGhe = 'vip';
+                $giaVe = $request->giaVeVip;
+            } else {
+                $loaiGhe = 'thuong';
+                $giaVe = $request->giaVeThuong;
             }
+
+            $seats[] = [
+                'tenGhe' => $tenGhe,
+                'loaiGhe' => $loaiGhe,
+                'giaVe' => $giaVe,
+                'daDat' => false,
+                'maLichChieu' => $showtime->maLichChieu,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
     }
+
+    // Insert tất cả ghế 1 lần duy nhất
+    Seat::insert($seats);
+}
+
 
     return response()->json([
         'status' => 200,

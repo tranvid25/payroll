@@ -26,7 +26,7 @@ class MovieController extends Controller
             ]);
         }
     }
-    // lấy chi tiết phim kèm với lịch của nó ở các rạp
+    // lấy chi tiết phim kèm với lịch của nó ở các rạp mọi nơi
     public function show($maPhim)
     {
         $movie = Movie::with(['lichchieu.rapChieu'])->where('maPhim', $maPhim)->first();
@@ -43,6 +43,43 @@ class MovieController extends Controller
             'content' => $movie
         ]);
     }
+    //lấy  chi tiết phim kèm với lịch nó ở các rạp theo thành phố
+    public function showCity($maPhim)
+{
+    $movie = Movie::with(['lichchieu.rapChieu.tinhthanh'])->where('maPhim', $maPhim)->first();
+
+    if (!$movie) {
+        return response()->json([
+            'status' => 404,
+            'message' => 'Không tìm thấy phim'
+        ]);
+    }
+
+    // Gom theo tỉnh và rạp
+    $grouped = [];
+
+    foreach ($movie->lichchieu as $lich) {
+        $tenTinh = $lich->rapChieu->tinhthanh->tenTinh ?? 'Không rõ thành phố';
+        $tenRap = $lich->rapChieu->tenRap;
+
+        $grouped[$tenTinh][$tenRap][] = [
+            'ngayChieu' => $lich->ngayChieu,
+            'gioChieu' => $lich->gioChieu,
+            'maLichChieu' => $lich->maLichChieu,
+        ];
+    }
+
+    return response()->json([
+        'status' => 200,
+        'phim' => [
+            'maPhim' => $movie->maPhim,
+            'tenPhim' => $movie->tenPhim,
+            'moTa' => $movie->moTa,
+        ],
+        'raps' => $grouped,
+    ]);
+}
+
 
     public function store(Request $request)
 {

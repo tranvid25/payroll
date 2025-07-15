@@ -43,14 +43,12 @@ class OrderDetailController extends Controller
             ]);
         }
     }
-    public function store(Request $request)
+        public function store(Request $request)
 {
     // 1. Validate dữ liệu đầu vào
     $validator = Validator::make($request->all(), [
-        'maLichChieu' => 'required|exists:showtimes,id',
-        'danhSachGhe' => 'required|string',
-        'danhSachMaGhe' => 'required|string',
-        'tongTien' => 'required|numeric|min:0',
+        'maLichChieu' => 'required|exists:showtime,maLichChieu',
+        'danhSachGhe' => 'required|string', // chuỗi dạng: "101,102,103"
         'userId' => 'nullable|exists:users,id',
         'name' => 'required|string|max:255',
         'email' => 'required|email',
@@ -64,9 +62,8 @@ class OrderDetailController extends Controller
         ], 422);
     }
 
-    // 2. Lấy thông tin từ lịch chiếu và liên kết
-    $showtime = Showtime::with('rapChieu', 'phim')->find($request->maLichChieu);
-
+    // 2. Lấy thông tin lịch chiếu kèm phim và rạp
+    $showtime = Showtime::with(['rapChieu', 'phim'])->where('maLichChieu', $request->maLichChieu)->first();
     if (!$showtime || !$showtime->rapChieu || !$showtime->phim) {
         return response()->json([
             'status' => 404,
@@ -74,53 +71,55 @@ class OrderDetailController extends Controller
         ], 404);
     }
 
-    $tenRap = $showtime->rapChieu->tenRap;
-    $tenPhim = $showtime->phim->tenPhim;
-    $gioChieu = $showtime->gioChieu;
-    $ngayChieu = $showtime->ngayChieu;
-    $maPhim = $showtime->maPhim;
+    // 3. Xử lý danh sách mã ghế
+    $arrMaGhe = array_map('intval', explode(',', $request->danhSachGhe));
 
-    // 3. Kiểm tra ghế đã được đặt chưa
-    $arrMaGhe = array_map('intval', explode(',', $request->danhSachMaGhe));
-    $gheDaDat = Seat::whereIn("maGhe", $arrMaGhe)
-                    ->whereNotNull('nguoiDat')
-                    ->pluck('maGhe');
+    // 4. Lấy danh sách ghế và kiểm tra ghế đã được đặt
+    $seats = Seat::whereIn('maGhe', $arrMaGhe)
+                ->where('maLichChieu', $request->maLichChieu)
+                ->get();
+
+    $gheDaDat = $seats->filter(fn($ghe) => $ghe->daDat);
 
     if ($gheDaDat->count() > 0) {
         return response()->json([
             'status' => 409,
-            'message' => 'Một số ghế đã được đặt: ' . $gheDaDat->implode(', ')
+            'message' => 'Một số ghế đã được đặt: ' . $gheDaDat->pluck('tenGhe')->implode(', ')
         ], 409);
     }
 
-    // 4. Lưu đơn hàng
+    // 5. Tính tổng tiền từ ghế
+    $tongTien = $seats->sum('giaVe');
+    $danhSachTenGhe = $seats->pluck('tenGhe')->implode(', ');
+
+    // 6. Lưu đơn hàng
     $order = OrderDetail::create([
         'maLichChieu' => $request->maLichChieu,
-        'maPhim' => $maPhim,
-        'phim' => $tenPhim,
-        'rapChieu' => $tenRap,
-        'gioChieu' => $gioChieu,
-        'ngayChieu' => $ngayChieu,
-        'danhSachGhe' => $request->danhSachGhe,
-        'tongTien' => $request->tongTien,
+        'maPhim' => $showtime->maPhim,
+        'phim' => $showtime->phim->tenPhim,
+        'rapChieu' => $showtime->rapChieu->tenRap,
+        'gioChieu' => $showtime->gioChieu,
+        'ngayChieu' => $showtime->ngayChieu,
+        'danhSachGhe' => $danhSachTenGhe,
+        'tongTien' => $tongTien,
         'userId' => $request->userId,
         'name' => $request->name,
         'email' => $request->email,
     ]);
 
-    // 5. Đánh dấu ghế đã được đặt
-    Seat::whereIn("maGhe", $arrMaGhe)->update([
-        'nguoiDat' => $request->userId,
+    // 7. Đánh dấu ghế đã đặt
+    Seat::whereIn('maGhe', $arrMaGhe)->update([
+        'daDat' => 1,
     ]);
 
-    // 6. Gửi email xác nhận
+    // 8. Gửi email xác nhận
     Mail::send('mail.sendEmail', [
-        'rapChieu' => $tenRap,
-        'phim' => $tenPhim,
-        'gioChieu' => $gioChieu,
-        'ngayChieu' => $ngayChieu,
-        'danhSachGhe' => $request->danhSachGhe,
-        'tongTien' => $request->tongTien,
+        'rapChieu' => $showtime->rapChieu->tenRap,
+        'phim' => $showtime->phim->tenPhim,
+        'gioChieu' => $showtime->gioChieu,
+        'ngayChieu' => $showtime->ngayChieu,
+        'danhSachGhe' => $danhSachTenGhe,
+        'tongTien' => $tongTien,
         'name' => $request->name,
         'email' => $request->email,
     ], function ($message) use ($request) {
@@ -128,13 +127,15 @@ class OrderDetailController extends Controller
                 ->subject('PHTV - Thông tin đặt vé');
     });
 
-    // 7. Trả kết quả
+    // 9. Trả kết quả
     return response()->json([
         'status' => 200,
         'message' => 'Đặt vé thành công!',
         'content' => $order
     ]);
 }
+
+
     public function showByUser($id)
     {
         $order = OrderDetail::where('userId', $id)->get();

@@ -26,7 +26,7 @@ class CommentMovieController extends Controller
         }
     }
     public function show($id){
-        $comment=Comment::where('maPhim',$id)->with('tinPhim')->get();
+        $comment=Comment::where('maPhim',$id)->get();
         if($comment){
             return response()->json([
                 'status'=>200,
