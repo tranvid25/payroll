@@ -68,3 +68,4 @@ redis-server.exe --port 1000 //khởi động cổng redis1000
  redis-cli.exe -p 1000 //chạy cổng 1000 ở tab mới
  KEYS laravel_database_blacklist:token:*
 
+9ABRph

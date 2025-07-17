@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 class MovieController extends Controller
 {
+    public function search(Request $request){
+        $keyword = $request->query('q');
+        $movies = Movie::where('tenPhim','like',"%$keyword%")
+            ->orWhere('moTa','like',"%$keyword%")
+            ->get();
+        return response()->json([
+            'status' => 200,
+            'content' => $movies
+        ]);
+    }
     public function index(){
         $movie=Movie::all();
         if($movie){

@@ -30,7 +30,7 @@ class SeatController extends Controller
         if($ghengoi){
             return response()->json([
                 'status'=>200,
-                'message'=>$ghengoi
+                'content'=>$ghengoi
             ]);
         }
         else

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\CommentMovieController;
 use App\Http\Controllers\Api\CommentNewsController;
 use App\Http\Controllers\Api\FeedBackController;
@@ -47,13 +48,7 @@ use Illuminate\Support\Facades\Route;
         Route::get('laydanhsachbinhluan/{id}/edit', [CommentNewsController::class, 'edit']);
         Route::post('laydanhsachbinhluan/{id}/update', [CommentNewsController::class, 'update']);
         Route::delete('laydanhsachbinhluan/{id}/delete', [CommentNewsController::class, 'destroy']);
-        //Review movie
-        Route::get('laydanhsachbinhluanphim', [CommentMovieController::class, 'index']);
-        Route::post('laydanhsachbinhluanphim', [CommentMovieController::class, 'store']);
-        Route::get('laydanhsachbinhluanphim/{id}', [CommentMovieController::class, 'show']);
-        Route::get('laydanhsachbinhluanphim/{id}/edit', [CommentMovieController::class, 'edit']);
-        Route::post('laydanhsachbinhluanphim/{id}/update', [CommentMovieController::class, 'update']);
-        Route::delete('laydanhsachbinhluanphim/{id}/delete', [CommentMovieController::class, 'destroy']);
+        //Review movie;
         //FeedBack
         Route::get('laydanhsachfeedback', [FeedBackController::class, 'index']);
         Route::post('laydanhsachfeedback', [FeedBackController::class, 'store']);
@@ -87,6 +82,7 @@ use Illuminate\Support\Facades\Route;
         Route::get('laydanhsachghe/{id}', [SeatController::class, 'show']);
         Route::delete('laydanhsachghe/{id}/delete', [SeatController::class, 'destroy']);
         //Lịch Chiếu
+        Route::get('laydanhsachghe/{maLichChieu}', [ShowtimeController::class, 'getSeatsByShowtime']);
         Route::get('laydanhsachlichchieu', [ShowtimeController::class, 'index']);
         Route::post('laydanhsachlichchieu', [ShowtimeController::class, 'store']);
         Route::get('laydanhsachlichchieu/{id}', [ShowtimeController::class, 'show']);
@@ -102,6 +98,9 @@ use Illuminate\Support\Facades\Route;
         //Tỉnh
         Route::get('laydanhsachtinh', [ProvinceController::class, 'index']);
         Route::post('laydanhsachtinh', [ProvinceController::class, 'store']);
+        //Search
+        Route::get('/movies/search', [MovieController::class, 'search']);
+
         Route::group([
     'prefix' => 'auth'
 ], function () {
@@ -120,5 +119,12 @@ use Illuminate\Support\Facades\Route;
         Route::get('laydanhsachbinhluanphim/{id}/edit', [CommentMovieController::class, 'edit']);
         Route::post('laydanhsachbinhluanphim/{id}/update', [CommentMovieController::class, 'update']);
         Route::delete('laydanhsachbinhluanphim/{id}/delete', [CommentMovieController::class, 'destroy']);
+        Route::get('laydanhsachbinhluan', [CommentNewsController::class, 'index']);
+        Route::post('laydanhsachbinhluan', [CommentNewsController::class, 'store']);
+        Route::get('laydanhsachbinhluan/{id}', [CommentNewsController::class, 'show']);
+        Route::get('laydanhsachbinhluan/{id}/edit', [CommentNewsController::class, 'edit']);
+        Route::post('laydanhsachbinhluan/{id}/update', [CommentNewsController::class, 'update']);
+        Route::delete('laydanhsachbinhluan/{id}/delete', [CommentNewsController::class, 'destroy']);
+        Route::post('send-message', [ChatController::class, 'sendMessage']);
     });
 });

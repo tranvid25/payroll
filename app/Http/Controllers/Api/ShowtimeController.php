@@ -193,4 +193,18 @@ class ShowtimeController extends Controller
     }
    }
 
+    public function getSeatsByShowtime($maLichChieu) {
+        $seats = \App\Models\Seat::where('maLichChieu', $maLichChieu)->get();
+        if ($seats) {
+            return response()->json([
+                'status' => 200,
+                'content' => $seats
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'No seats found'
+            ], 404);
+        }
+    }
 }
