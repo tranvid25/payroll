@@ -125,6 +125,7 @@ use Illuminate\Support\Facades\Route;
         Route::get('laydanhsachbinhluan/{id}/edit', [CommentNewsController::class, 'edit']);
         Route::post('laydanhsachbinhluan/{id}/update', [CommentNewsController::class, 'update']);
         Route::delete('laydanhsachbinhluan/{id}/delete', [CommentNewsController::class, 'destroy']);
-        Route::post('send-message', [ChatController::class, 'sendMessage']);
+        Route::get('/messages', [ChatController::class, 'index']);
+        Route::post('/messages', [ChatController::class, 'store']);
     });
 });
