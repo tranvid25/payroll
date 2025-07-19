@@ -2,31 +2,35 @@
 
 namespace App\Events;
 
-use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserOnline implements ShouldBroadcast
+class NewPromotionNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user;
-    public $message;
-    public $hinhAnhUrl;
+    /**
+     * Create a new event instance.
+     */
+    public $notification;
 
-    public function __construct(User $user, $message, $hinhAnhUrl = null)
+    public function __construct($notification)
     {
-        $this->user = $user;
-        $this->message = $message;
-        $this->hinhAnhUrl = $hinhAnhUrl;
+        $this->notification = $notification;
     }
 
     public function broadcastOn()
     {
-        return new PresenceChannel('chat');
+        return new Channel('promotion-channel');
+    }
+
+    public function broadcastAs()
+    {
+        return 'promotion-event';
     }
 }

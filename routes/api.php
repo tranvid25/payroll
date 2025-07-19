@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\FeedBackController;
 use App\Http\Controllers\Api\MovieController;
 use App\Http\Controllers\Api\newsController;
 use App\Http\Controllers\Api\OrderDetailController;
+use App\Http\Controllers\Api\PromotionNotificationController;
 use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Api\RapChieuController;
 use App\Http\Controllers\Api\SeatController;
@@ -127,5 +128,9 @@ use Illuminate\Support\Facades\Route;
         Route::delete('laydanhsachbinhluan/{id}/delete', [CommentNewsController::class, 'destroy']);
         Route::get('/messages', [ChatController::class, 'index']);
         Route::post('/messages', [ChatController::class, 'store']);
+        //Notification
+        Route::get('notification/unread',[PromotionNotificationController::class,'unread']);
+        Route::post('notification/create',[PromotionNotificationController::class,'store']);// admin tạo
+        Route::post('notification/{id}/read',[PromotionNotificationController::class,'markAsRead']);
     });
 });
